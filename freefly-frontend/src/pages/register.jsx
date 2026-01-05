@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../config";
 
 export default function Register({ closeModal }) {
   const [name, setName] = useState("");
@@ -17,7 +18,7 @@ export default function Register({ closeModal }) {
     setSuccess("");
 
     try {
-      const res = await fetch("http://localhost:8383/api/register", {
+      const res = await fetch(`${API_URL}/api/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, surname, dob, email, password }),

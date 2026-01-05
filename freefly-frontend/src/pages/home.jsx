@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Login from "./login";
 import Register from "./register";
+import { API_URL } from "../config";
 
 function AirportInput({ label, placeholder, value, setValue, onSelect, className }) {
     const [query, setQuery] = useState("");
@@ -15,8 +16,7 @@ function AirportInput({ label, placeholder, value, setValue, onSelect, className
             setOpen(false);
             return;
         }
-
-        fetch(`http://localhost:8383/api/airports?q=${encodeURIComponent(query)}`)
+        fetch(`${API_URL}/api/airports?q=${encodeURIComponent(query)}`)
             .then((res) => res.json())
             .then((data) => {
                 setSuggestions(data);
@@ -144,9 +144,9 @@ export default function Home() {
                 alert("Please select a return date.");
                 return;
             }
-            url = `http://localhost:8383/return/${dep}/${ari}/${begin}/${end}/${type}/${adults}/${children}/${infants}`;
+            url = `${API_URL}/${dep}/${ari}/${begin}/${end}/${type}/${adults}/${children}/${infants}`;
         } else {
-            url = `http://localhost:8383/oneway/${dep}/${ari}/${begin}/${type}/${adults}/${children}/${infants}`;
+            url = `${API_URL}/oneway/${dep}/${ari}/${begin}/${type}/${adults}/${children}/${infants}`;
         }
 
         try {

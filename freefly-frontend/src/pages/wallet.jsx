@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../config";
 
 export default function Wallet() {
     const navigate = useNavigate();
@@ -14,7 +15,7 @@ export default function Wallet() {
 
     // Load wallet data
     useEffect(() => {
-        fetch("http://localhost:8383/api/wallet", {
+        fetch(`${API_URL}/api/wallet`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -46,7 +47,7 @@ export default function Wallet() {
 
         setLoading(true);
         try {
-            const res = await fetch("http://localhost:8383/api/wallet/top-up", {
+            const res = await fetch(`${API_URL}/api/wallet/top-up`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

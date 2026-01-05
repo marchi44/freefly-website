@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
 import jsPDF from "jspdf";
 import QRCode from "qrcode";
+import { API_URL } from "../config";
 
 export default function Ticket() {
     const { bookingId } = useParams();
@@ -18,7 +19,7 @@ export default function Ticket() {
         async function loadTicket() {
             try {
                 const res = await fetch(
-                    `http://localhost:8383/api/tickets/${bookingId}`,
+                    `${API_URL}/api/tickets/${bookingId}`,
                     {
                         headers: { Authorization: `Bearer ${token}` },
                     }

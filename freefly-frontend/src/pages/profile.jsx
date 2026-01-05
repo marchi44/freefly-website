@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../config";
 
 export default function Profile() {
     const navigate = useNavigate();
@@ -14,7 +15,7 @@ export default function Profile() {
         if (!token) return;
 
         // Load profile
-        fetch("http://localhost:8383/api/profile", {
+        fetch(`${API_URL}/api/profile`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -27,7 +28,7 @@ export default function Profile() {
             .catch(() => setError("Failed to load profile"));
 
         // Load tickets
-        fetch("http://localhost:8383/api/tickets", {
+        fetch(`${API_URL}/api/tickets`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

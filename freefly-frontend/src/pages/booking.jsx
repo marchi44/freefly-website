@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../config";
 
 function pickDate(isoString) {
   if (!isoString || typeof isoString !== "string") return "";
@@ -152,7 +153,7 @@ export default function Booking() {
     }
 
     try {
-      const res = await fetch("http://localhost:8383/api/wallet/buy-ticket", {
+      const res = await fetch(`${API_URL}/api/buy-ticket`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
