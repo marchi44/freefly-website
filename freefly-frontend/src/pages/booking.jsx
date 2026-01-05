@@ -153,7 +153,7 @@ export default function Booking() {
     }
 
     try {
-      const res = await fetch(`${API_URL}/api/buy-ticket`, {
+      const res = await fetch(`${API_URL}/api/wallet/buy-ticket`,{
         method: "POST",
         headers: {
           "Content-Type": "application/json",
