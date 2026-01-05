@@ -183,35 +183,6 @@ export default function Booking() {
 
   return (
     <div className="min-h-screen bg-mediumGray text-white">
-      {}
-      <header
-        className="topBar
-                   sticky top-0 z-20
-                   w-full items-center 
-                   bg-darkGray flex flex-row
-                   text-white px-8 py-3"
-      >
-        <div
-          className="items-center
-                        flex flex-row 
-                        gap-x-2 
-                        topBarKaire"
-        >
-          <Link to="/">
-            <img className="logo h-12 w-12" src="/Images/LOGO.png" alt="FreeFly logo" />
-          </Link>
-          <div className="flex flex-col topBarVid">
-            <p className="font-roboto text-[24px]">FreeFly</p>
-            <p className="font-roboto text-[16px]">Find your perfect flight!</p>
-          </div>
-        </div>
-        <div className="topBarDesine flex gap-x-4 ml-auto">
-          <Link to="/login">Log In</Link>
-          <Link to="/register">Register</Link>
-        </div>
-      </header>
-
-      {}
       <main className="max-w-4xl mx-auto mt-8 px-4 pb-10">
         <h1 className="text-3xl font-semibold mb-2">Booking Form</h1>
         <p className="text-sm text-gray-200 mb-6">
