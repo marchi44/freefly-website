@@ -512,15 +512,18 @@ app.get("/api/tickets", auth, async (req, res) => {
 });
 
 
-const distPath = path.join(__dirname, "..", "dist");
-app.use(express.static(distPath));
+//const distPath = path.join(__dirname, "..", "dist");
+//app.use(express.static(distPath));
 
-app.get(/.*/, (req, res) => {
-    res.sendFile(path.join(distPath, "index.html"));
+//app.get(/.*/, (req, res) => {
+ //   res.sendFile(path.join(distPath, "index.html"));
+//});
+
+app.get("/", (req, res) => {
+  res.send("Backend is running");
 });
 
 app.listen(PORT, () => {
-  console.log("Backend running on http://localhost:" + PORT);
-  console.log("Backend test: http://localhost:" + PORT + "/oneway/LON/NYC/251215/0/2/1/1");
+  console.log(`Backend running on port ${PORT}`);
 });
 //push
