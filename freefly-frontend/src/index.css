@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@theme{
+  --color-darkGray: #242424;
+  --color-mediumGray: #555555;
+}
+
+body {
+  @apply bg-mediumGray text-white;
+  margin: 0;
+}
