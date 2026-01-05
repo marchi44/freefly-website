@@ -222,87 +222,102 @@ app.get('/oneway/:dep/:ari/:begin/:type/:adults/:children/:infants', async (req,
         res.status(500).json({ error: 'Failed to get flights' });
     }
 });
+app.get(
+    "/return/:dep/:ari/:begin/:end/:type/:adults/:children/:infants",
+    async (req, res) => {
+        const { dep, ari, begin, end, type, adults, children, infants } = req.params;
 
-app.get('/return/:dep/:ari/:begin/:end/:type/:adults/:children/:infants', async (req, res) => {
-    const { dep, ari, begin, end, type, adults, children, infants } = req.params;
+        const fromDate = util.stringToDate(begin);
+        const toDate = util.stringToDate(end);
 
-    const fromDate = util.stringToDate(begin);
-    const toDate = util.stringToDate(end);
+        // safety check
+        if (toDate < fromDate) {
+            return res.status(400).json({ error: "Return date must be after departure date" });
+        }
 
-    try {
-        const response = await amadeus.shopping.flightOffersSearch.get({
-            originLocationCode: dep.toUpperCase(),
-            destinationLocationCode: ari.toUpperCase(),
-            departureDate: fromDate.toISOString().split('T')[0],
-            returnDate: toDate.toISOString().split('T')[0],
-            adults: parseInt(adults),
-            children: parseInt(children),
-            infants: parseInt(infants),
-            currencyCode: 'EUR',
-            travelClass: util.typeToClass(type),
-            max: 250
-        });
+        try {
+            // 🔑 BUILD PARAMS CONDITIONALLY
+            const params = {
+                originLocationCode: dep.toUpperCase(),
+                destinationLocationCode: ari.toUpperCase(),
+                departureDate: fromDate.toISOString().split("T")[0],
+                returnDate: toDate.toISOString().split("T")[0],
+                adults: Number(adults),
+                currencyCode: "EUR",
+                travelClass: util.typeToClass(type),
+                max: 250,
+            };
 
-        const offers = response.data
-            .map((offer) => {
-                const [outbound, inbound] = offer.itineraries || [];
-                if (!outbound || !inbound) return null;
+            // 🚨 DO NOT SEND ZERO VALUES
+            if (Number(children) > 0) params.children = Number(children);
+            if (Number(infants) > 0) params.infants = Number(infants);
 
-                const outSegs = Array.isArray(outbound.segments) ? outbound.segments : [];
-                const inSegs = Array.isArray(inbound.segments) ? inbound.segments : [];
-                const outFirst = outSegs[0];
-                const outLast = outSegs[outSegs.length - 1];
-                const inFirst = inSegs[0];
-                const inLast = inSegs[inSegs.length - 1];
-                if (!outFirst || !outLast || !inFirst || !inLast) return null;
+            const response = await amadeus.shopping.flightOffersSearch.get(params);
 
-                const mapSeg = (s) => ({
-                    flightNumber: `${s.carrierCode}${s.number}`,
-                    departureAirport: s.departure.iataCode,
-                    arrivalAirport: s.arrival.iataCode,
-                    departureTime: s.departure.at,
-                    arrivalTime: s.arrival.at,
-                    duration: s.duration,
-                });
+            const offers = response.data
+                .map((offer) => {
+                    const [outbound, inbound] = offer.itineraries || [];
+                    if (!outbound || !inbound) return null;
 
-                return {
-                    airline: offer.validatingAirlineCodes?.[0],
-                    totalPriceEUR: offer.price?.total,
-                    passengers: {
-                        adults: parseInt(adults),
-                        children: parseInt(children),
-                        infants: parseInt(infants),
-                    },
-                    outbound: {
-                        flightNumber: `${outFirst.carrierCode}${outFirst.number}`,
-                        departureAirport: outFirst.departure.iataCode,
-                        arrivalAirport: outLast.arrival.iataCode,
-                        departureTime: outFirst.departure.at,
-                        arrivalTime: outLast.arrival.at,
-                        duration: outbound.duration,
-                        stopsCount: Math.max(0, outSegs.length - 1),
-                        segments: outSegs.map(mapSeg),
-                    },
-                    inbound: {
-                        flightNumber: `${inFirst.carrierCode}${inFirst.number}`,
-                        departureAirport: inFirst.departure.iataCode,
-                        arrivalAirport: inLast.arrival.iataCode,
-                        departureTime: inFirst.departure.at,
-                        arrivalTime: inLast.arrival.at,
-                        duration: inbound.duration,
-                        stopsCount: Math.max(0, inSegs.length - 1),
-                        segments: inSegs.map(mapSeg),
-                    },
-                };
-            })
-            .filter(Boolean);
+                    const outSegs = outbound.segments || [];
+                    const inSegs = inbound.segments || [];
+                    if (!outSegs.length || !inSegs.length) return null;
 
-        res.json(offers);
-    } catch (err) {
-        console.error('Error getting return flights:', err);
-        res.status(500).json({ error: 'Failed getting return flights' });
+                    const outFirst = outSegs[0];
+                    const outLast = outSegs[outSegs.length - 1];
+                    const inFirst = inSegs[0];
+                    const inLast = inSegs[inSegs.length - 1];
+
+                    const mapSeg = (s) => ({
+                        flightNumber: `${s.carrierCode}${s.number}`,
+                        departureAirport: s.departure.iataCode,
+                        arrivalAirport: s.arrival.iataCode,
+                        departureTime: s.departure.at,
+                        arrivalTime: s.arrival.at,
+                        duration: s.duration,
+                    });
+
+                    return {
+                        airline: offer.validatingAirlineCodes?.[0],
+                        totalPriceEUR: offer.price?.total,
+
+                        passengers: {
+                            adults: Number(adults),
+                            children: Number(children),
+                            infants: Number(infants),
+                        },
+
+                        outbound: {
+                            departureAirport: outFirst.departure.iataCode,
+                            arrivalAirport: outLast.arrival.iataCode,
+                            departureTime: outFirst.departure.at,
+                            arrivalTime: outLast.arrival.at,
+                            duration: outbound.duration,
+                            stopsCount: Math.max(0, outSegs.length - 1),
+                            segments: outSegs.map(mapSeg),
+                        },
+
+                        inbound: {
+                            departureAirport: inFirst.departure.iataCode,
+                            arrivalAirport: inLast.arrival.iataCode,
+                            departureTime: inFirst.departure.at,
+                            arrivalTime: inLast.arrival.at,
+                            duration: inbound.duration,
+                            stopsCount: Math.max(0, inSegs.length - 1),
+                            segments: inSegs.map(mapSeg),
+                        },
+                    };
+                })
+                .filter(Boolean);
+
+            res.json(offers);
+        } catch (err) {
+            console.error("Error getting return flights:", err?.response?.data || err);
+            res.status(500).json({ error: "Failed getting return flights" });
+        }
     }
-});
+);
+
 
 app.get("/api/profile", auth, async (req, res) => {
     try {

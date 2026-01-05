@@ -144,7 +144,7 @@ export default function Home() {
                 alert("Please select a return date.");
                 return;
             }
-            url = `${API_URL}/${dep}/${ari}/${begin}/${end}/${type}/${adults}/${children}/${infants}`;
+            url = `${API_URL}/return/${dep}/${ari}/${begin}/${end}/${type}/${adults}/${children}/${infants}`;
         } else {
             url = `${API_URL}/oneway/${dep}/${ari}/${begin}/${type}/${adults}/${children}/${infants}`;
         }
